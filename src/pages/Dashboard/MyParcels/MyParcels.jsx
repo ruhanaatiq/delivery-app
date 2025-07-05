@@ -3,7 +3,7 @@ import React from 'react';
 import useAuth from '../../../hooks/useAuth';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
 import Swal from 'sweetalert2';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 const MyParcels = () => {
     const { user } = useAuth();
@@ -13,12 +13,15 @@ const MyParcels = () => {
     const { data: parcels = [], refetch } = useQuery({
         queryKey: ['my-parcels', user.email],
         queryFn: async () => {
-            const res = await axiosSecure.get(`/parcels?email=${user.email}`);
+            const res = await axiosSecure.get(`/parcels?email=${user.email}`, {
+                headers: {
+                    Authorization: `Bearer ${user.accessToken}`,
+                },
+            });
             return res.data;
-        }
-    })
-
-    console.log(parcels);
+        },
+        enabled: !!user?.email, // only fetch when user is available
+    });
 
     const handleView = (id) => {
         console.log("View parcel", id);
@@ -27,7 +30,7 @@ const MyParcels = () => {
 
     const handlePay = (id) => {
         console.log("Proceed to payment for", id);
-        navigate(`/dashboard/payment/${id}`)
+        navigate(`/dashboard/payment/${id}`);
     };
 
     const handleDelete = async (id) => {
@@ -38,28 +41,22 @@ const MyParcels = () => {
             showCancelButton: true,
             confirmButtonText: "Yes, delete it",
             cancelButtonText: "Cancel",
-            confirmButtonColor: "#e11d48", // red-600
-            cancelButtonColor: "#6b7280",  // gray-500
+            confirmButtonColor: "#e11d48",
+            cancelButtonColor: "#6b7280",
         });
         if (confirm.isConfirmed) {
             try {
-
-                axiosSecure.delete(`/parcels/${id}`)
-                    .then(res => {
-                        console.log(res.data);
-                        if (res.data.deletedCount) {
-                            Swal.fire({
-                                title: "Deleted!",
-                                text: "Parcel has been deleted.",
-                                icon: "success",
-                                timer: 1500,
-                                showConfirmButton: false,
-                            });
-                        }
-                        refetch();
-                    })
-
-
+                const res = await axiosSecure.delete(`/parcels/${id}`);
+                if (res.data.deletedCount) {
+                    Swal.fire({
+                        title: "Deleted!",
+                        text: "Parcel has been deleted.",
+                        icon: "success",
+                        timer: 1500,
+                        showConfirmButton: false,
+                    });
+                    refetch();
+                }
             } catch (err) {
                 Swal.fire("Error", err.message || "Failed to delete parcel", "error");
             }
@@ -67,7 +64,7 @@ const MyParcels = () => {
     };
 
     const formatDate = (iso) => {
-        return new Date(iso).toLocaleString(); // Format: "6/22/2025, 3:11:31 AM"
+        return new Date(iso).toLocaleString();
     };
 
     return (
@@ -128,7 +125,7 @@ const MyParcels = () => {
                     ))}
                     {parcels.length === 0 && (
                         <tr>
-                            <td colSpan="6" className="text-center text-gray-500 py-6">
+                            <td colSpan="7" className="text-center text-gray-500 py-6">
                                 No parcels found.
                             </td>
                         </tr>
