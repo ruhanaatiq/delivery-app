@@ -3,21 +3,25 @@ import useAuth from '../hooks/useAuth';
 import useUserRole from '../hooks/useUserRole';
 import { Navigate, useLocation } from 'react-router-dom';
 
-const AdminRoute = ({ children }) => {
+const RiderRoute = ({ children }) => {
     const { user, loading } = useAuth();
     const { role, roleLoading } = useUserRole();
     const location = useLocation();
 
     if (loading || roleLoading) {
-        return <span className="loading loading-spinner loading-xl"></span>;
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <span className="loading loading-spinner loading-lg text-primary"></span>
+            </div>
+        );
     }
 
-    if (!user || role !== 'admin') {
+    // Redirect if not authenticated or not a rider
+    if (!user || role !== 'rider') {
         return <Navigate to="/forbidden" state={{ from: location }} replace />;
     }
 
     return children;
 };
 
-export default AdminRoute;
- 
+export default RiderRoute;

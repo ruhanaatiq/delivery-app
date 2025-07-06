@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, Outlet } from 'react-router';
+import { NavLink, Outlet } from 'react-router-dom';
 import ProFastLogo from '../pages/shared/ProFastLogo/ProFastLogo';
 import { FaHome, FaBoxOpen, FaMoneyCheckAlt, FaUserEdit, FaSearchLocation, FaUserCheck, FaUserClock, FaUserShield, FaMotorcycle } from 'react-icons/fa';
 import useUserRole from '../hooks/useUserRole';

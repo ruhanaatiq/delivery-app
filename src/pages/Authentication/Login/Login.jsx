@@ -11,14 +11,34 @@ const Login = () => {
     const navigate = useNavigate();
     const from = location.state?.from || '/';
 
-    const onSubmit = data => {
+    // ✅ Save user to MongoDB
+    const saveUserToDB = async (user) => {
+        try {
+            await fetch('http://localhost:5000/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: user.email,
+                    name: user.displayName || 'Anonymous',
+                    photoURL: user.photoURL || '',
+                }),
+            });
+        } catch (error) {
+            console.error('Failed to save user to DB:', error);
+        }
+    };
+
+    const onSubmit = (data) => {
         signIn(data.email, data.password)
             .then(result => {
-                console.log(result.user);
+                const user = result.user;
+                saveUserToDB(user); // 💾 Save user to DB
                 navigate(from);
             })
-            .catch(error => console.log(error))
-    }
+            .catch(error => {
+                console.error('Login error:', error);
+            });
+    };
 
     return (
         <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
@@ -31,8 +51,9 @@ const Login = () => {
                         <input
                             type="email"
                             {...register('email')}
-                            className="input" placeholder="Email" />
-
+                            className="input"
+                            placeholder="Email"
+                        />
 
                         <label className="label">Password</label>
                         <input
@@ -41,21 +62,26 @@ const Login = () => {
                                 required: true,
                                 minLength: 6
                             })}
-                            className="input" placeholder="Password" />
-                        {
-                            errors.password?.type === 'required' && <p className='text-red-500'>Password is required</p>
-                        }
-                        {
-                            errors.password?.type === 'minLength' && <p className='text-red-500'>Password Must be 6 characters or longer</p>
-                        }
+                            className="input"
+                            placeholder="Password"
+                        />
+                        {errors.password?.type === 'required' && (
+                            <p className='text-red-500'>Password is required</p>
+                        )}
+                        {errors.password?.type === 'minLength' && (
+                            <p className='text-red-500'>Password must be at least 6 characters</p>
+                        )}
 
                         <div><a className="link link-hover">Forgot password?</a></div>
 
                         <button className="btn btn-primary text-black mt-4">Login</button>
                     </fieldset>
+
                     <p><small>New to this website? <Link state={{ from }} className="btn btn-link" to="/register">Register</Link></small></p>
                 </form>
-                <SocialLogin></SocialLogin>
+
+                {/* 🔐 Social Login */}
+                <SocialLogin />
             </div>
         </div>
     );
