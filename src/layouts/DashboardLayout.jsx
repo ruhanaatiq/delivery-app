@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import ProFastLogo from '../pages/shared/ProFastLogo/ProFastLogo';
-import { FaHome, FaBoxOpen, FaMoneyCheckAlt, FaUserEdit, FaSearchLocation, FaUserCheck, FaUserClock, FaUserShield, FaMotorcycle } from 'react-icons/fa';
+import {FaTasks,FaWallet, FaHome, FaBoxOpen, FaMoneyCheckAlt, FaUserEdit, FaSearchLocation, FaUserCheck, FaUserClock, FaUserShield, FaMotorcycle,FaCheckCircle} from 'react-icons/fa';
 import useUserRole from '../hooks/useUserRole';
 import BeARider from '../pages/Dashboard/BeARider/BeARider';
 
@@ -46,7 +46,9 @@ const DashboardLayout = () => {
                 <label htmlFor="my-drawer-2" aria-label="close sidebar" className="drawer-overlay"></label>
                 <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4">
                     {/* Sidebar content here */}
-                    <ProFastLogo></ProFastLogo>
+                  <NavLink to="/">
+  <ProFastLogo />
+</NavLink>
                     <li>
                         <NavLink to="/dashboard">
                             <FaHome className="inline-block mr-2" />
